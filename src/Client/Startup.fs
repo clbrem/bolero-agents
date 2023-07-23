@@ -1,4 +1,4 @@
-namespace AgentBolero.Client
+namespace Client
 
 open Microsoft.AspNetCore.Components.WebAssembly.Hosting
 open Microsoft.Extensions.DependencyInjection
