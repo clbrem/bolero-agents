@@ -1,5 +1,6 @@
 namespace Client
 open Bolero
+open Bolero.Templating.Client
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 open System
@@ -26,7 +27,6 @@ module Post =
         
 
 module Main =
-
     open Elmish    
     open Bolero.Html
     let router = Router.infer Navigate id
@@ -43,6 +43,7 @@ module Main =
             .HeaderContent(              
               Main.StandardNav().Home(router.getRoute Home).Elt()
             )
+            .Input("nothing", fun thing -> Console.WriteLine(thing))
             .Post(fun _ -> dispatch Post)
             .Elt()
     
@@ -55,4 +56,4 @@ module Main =
         override this.Program =
             Program.mkProgram (fun _ -> Home, Cmd.none) update view
             |> Program.withRouter router
- 
+

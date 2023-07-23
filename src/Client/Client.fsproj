@@ -10,7 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bolero" Version="0.*" />
-    <PackageReference Include="Bolero.Build" Version="0.*" />
+    <PackageReference Include="Bolero.Build" Version="0.22.45" />
     <PackageReference Include="Bolero.HotReload" Version="0.22.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.*" />
     <PackageReference Include="System.Net.Http.Json" Version="7.0.*" />
