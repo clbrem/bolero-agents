@@ -45,7 +45,7 @@ module Main =
             )
             .Input("nothing", fun thing -> Console.WriteLine(thing))
             .Post(fun _ -> dispatch Post)
-            .Elt()
+            .Elt()            
     
     type MyApp() =
         inherit ProgramComponent<Model, Message>()

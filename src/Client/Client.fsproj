@@ -5,6 +5,7 @@
     <RootNamespace>AgentBolero.Client</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cmd.OfAgent.fs" />
     <Compile Include="Main.fs" />
     <Compile Include="Startup.fs" />
   </ItemGroup>
