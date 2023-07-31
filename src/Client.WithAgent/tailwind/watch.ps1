@@ -1,0 +1,1 @@
+tailwindcss -i tailwind.css -o ..\wwwroot\css\tailwind.css -w
