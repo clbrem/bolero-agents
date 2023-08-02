@@ -16,6 +16,7 @@
     <PackageReference Include="System.Net.Http.Json" Version="7.0.*" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Architectures.md" />
     <Content Include="tailwind\build.ps1" />
     <Content Include="tailwind\tailwind.config.js" />
     <Content Include="tailwind\tailwind.css" />

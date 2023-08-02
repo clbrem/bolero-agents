@@ -8,17 +8,30 @@ open System
 
 type Main = Template<"wwwroot/main.html">
 
-type Page =
-    
+
+type Page =    
     | [<EndPoint "/">] Home
     | [<EndPoint "/session">] Session of string
 
+
+////////////////////////
+///
+///  MESSAGE
+///
+//////////////////////
+
 type Message =
-    | Navigate of Page
-    | Redirect of Page
-    | Post
-    | SetInput of string
-    | Fetch
+    | Navigate of Page      // Navigate to a Page
+    | Redirect of Page      // Same as Navigate     
+    | Post                  // POST form
+    | SetInput of string    // Set form input
+    | Fetch                 // FETCH input history 
+
+////////////////////////////////////
+///
+///    MODEL
+///
+/////////////////////////////////// 
 
 type Model =
     { page: Page
@@ -27,13 +40,31 @@ type Model =
     
 
 module Main =
-    open Elmish    
+    open Elmish
+    
+    ///////////////////////////////////
+    ///
+    ///   ROUTER
+    ///
+    ///////////////////////////////////
 
     let router = Router.infer Navigate (fun model -> model.page)
+    
+    ///////////////////////////////////
+    ///
+    ///   INIT
+    ///
+    //////////////////////////////////
     let init = {
         page = Home
         input = ""
     }
+    
+    //////////////////////////////////
+    ///    
+    ///   UPDATE
+    ///
+    ///////////////////////////////////
 
     let update js message model =
         Console.WriteLine ($"{message}")
@@ -55,9 +86,14 @@ module Main =
         | Fetch ->
             model, 
             match model.page with
-            | Home -> Console.WriteLine("Already Home!"); Cmd.none
+            | Home -> Cmd.none
             | Session tok -> Cmd.OfJS.perform js "Database.read" [| Guid(tok) |] SetInput
         
+    ///////////////////////////////////////////
+    ///
+    ///  VIEW    
+    ///
+    /// //////////////////////////////////////
 
     let view (model: Model) dispatch =
         Main()
@@ -71,8 +107,8 @@ module Main =
     type MyApp() =
         inherit ProgramComponent<Model, Message>()
         
-        [<Inject>]
-        member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
+
+        
 
         override this.Program =
             Program.mkProgram ( fun _ -> init, Cmd.ofMsg Fetch) (update this.JSRuntime) view

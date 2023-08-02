@@ -2,13 +2,11 @@ namespace Client
 open Bolero
 open Bolero.Remoting.Client
 open Bolero.Templating.Client
-open Microsoft.AspNetCore.Components
-open Microsoft.JSInterop
 open System
 
 type Main = Template<"wwwroot/main.html">
 
-type Page =
+type Page = 
     
     | [<EndPoint "/">] Home
     | [<EndPoint "/session">] Session of string
@@ -23,25 +21,31 @@ type Message =
 type Model =
     { page: Page
       input: string
-     }
+    }
     
 
 module Main =
-    open Elmish    
-
+    open Elmish
+    
     let router = Router.infer Navigate (fun model -> model.page)
+        
     let init = {
         page = Home
         input = ""
     }
 
-    let update js message model =
-        Console.WriteLine ($"{message}")
+    let update debounce js message model =
+        Console.WriteLine $"{message}"
         match message with
         | Navigate page ->
             {model with page = page}, Cmd.ofMsg Fetch        
         | SetInput input ->
-            {model with input = input}, Cmd.none
+            /////////////////////////////
+            // 
+            // Added Debounce
+            //
+            ///////////////////////////
+            {model with input = input}, Agents.Cmd.OfAgent.perform debounce Post 
         | Redirect page ->
             { model with page = page }, Cmd.none
         | Post ->
@@ -55,7 +59,7 @@ module Main =
         | Fetch ->
             model, 
             match model.page with
-            | Home -> Console.WriteLine("Already Home!"); Cmd.none
+            | Home -> Cmd.none
             | Session tok -> Cmd.OfJS.perform js "Database.read" [| Guid(tok) |] SetInput
         
 
@@ -64,17 +68,27 @@ module Main =
             .HeaderContent(              
               Main.StandardNav().Home(router.getRoute Home).Elt()
             )
-            .Input(model.input, SetInput >> dispatch)
-            .Post(fun _ -> dispatch Post)
+            .Input(model.input, SetInput >> dispatch)            
             .Elt()            
     
     type MyApp() =
         inherit ProgramComponent<Model, Message>()
-        
-        [<Inject>]
-        member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
+        let TIMEOUT = TimeSpan.FromMilliseconds(500)
+        let debounce = MailboxProcessor.Start(
+            fun inbox ->
+                let rec loop timer =
+                    async {
+                        let! dispatch, msg = inbox.Receive()
+                        Agents.Timers.tryDispose timer
+                        use timer = Agents.Timers.wait TIMEOUT dispatch msg
+                        return! loop (Some timer)
+                    }
+                loop None
+            )
 
         override this.Program =
-            Program.mkProgram ( fun _ -> init, Cmd.ofMsg Fetch) (update this.JSRuntime) view
+            Program.mkProgram
+               ( fun _ -> init, Cmd.ofMsg Fetch)
+               (update debounce this.JSRuntime) view
             |> Program.withRouter router
 

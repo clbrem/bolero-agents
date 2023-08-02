@@ -1,4 +1,4 @@
-﻿namespace AgentBolero.Client
+﻿namespace Agents
 
 module Cmd =
     open Elmish
