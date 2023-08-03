@@ -1,0 +1,41 @@
+﻿<header>
+    ${HeaderContent}
+    <template id="StandardNav">
+        <nav class="container flex justify-between px-4 py-8 mx-auto bg-white">
+            <div>
+                <a href="${Home}">
+                    <h3 class=" text-2xl select-none font-medium text-green-700">Home</h3>
+                </a>
+            </div>
+            <div class="flex items-center">
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-3 h-3 ${Fill}"
+                        viewBox="0 0 6 6"
+                >
+                    <line x1="0" y1="1" x2="6" y2="1" class="stroke-black"/>
+                    <line x1="0" y1="3" x2="6" y2="3" class="stroke-black"/>
+                    <line x1="0" y1="5" x2="6" y2="5" class="stroke-black"/>
+                </svg>
+            </div>
+        </nav>
+    </template>
+</header>
+<div class="container flex px-4 py-8 justify-between mx-auto">
+    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="myInput" >
+                Input
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="myInput" type="text" placeholder="Input" bind="${Input}">
+        </div>
+    </form>
+</div>
+
+<template id="Spinner">
+    <button class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 font-bold  rounded">
+        <div class="flex items-center justify-center px-4">
+            <div class="w-6 h-6 border-b-2 border-white-900 rounded-full animate-spin"></div>
+        </div>
+    </button>
+</template>

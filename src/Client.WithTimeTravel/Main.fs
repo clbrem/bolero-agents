@@ -1,26 +1,29 @@
 namespace Client
 open System.Text.Json
+open System.Text.Json.Serialization
 open Bolero
 open Bolero.Remoting.Client
 open Bolero.Templating.Client
 open System
 open Microsoft.AspNetCore.Components
 
-
 type Main = Template<"wwwroot/main.html">
 
+[<JsonFSharpConverter>]
 type Page = 
     
     | [<EndPoint "/">] Home
     | [<EndPoint "/session">] Session of string
 
+[<JsonFSharpConverter>]
 type Message =
     | Navigate of Page
     | Redirect of Page
     | Post
     | SetInput of string
     | Fetch
-
+    
+[<CLIMutable>]
 type Model =
     { page: Page
       input: string
@@ -37,8 +40,16 @@ module Main =
         input = ""
     }
 
-    let update debounce js message model =
-        Console.WriteLine $"{message}"
+    let update  debounce js message model =
+        Console.WriteLine $"{JsonSerializer.Serialize(message)}"
+        let log (newModel, cmd) =
+            match model.page with
+            | Session session ->                
+                newModel, Cmd.batch [cmd; Cmd.OfJS.attempt js "Database.log" [|{|session = session; message = message|}|] (fun _ -> Redirect Home)]
+            | _ ->
+                newModel, cmd
+            
+    
         match message with
         | Navigate page ->
             {model with page = page}, Cmd.ofMsg Fetch        
@@ -64,7 +75,7 @@ module Main =
             match model.page with
             | Home -> Cmd.none
             | Session tok -> Cmd.OfJS.perform js "Database.read" [| Guid(tok) |] SetInput
-        
+        |> log 
 
     let view (model: Model) dispatch =
         Main()
@@ -76,9 +87,6 @@ module Main =
     
     type MyApp() =
         inherit ProgramComponent<Model, Message>()
-        
-        
-        
         let TIMEOUT = TimeSpan.FromMilliseconds(500)
         let debounce = MailboxProcessor.Start(
             fun inbox ->
@@ -91,8 +99,9 @@ module Main =
                     }
                 loop None
             )
+
         
-        
+
         override this.Program =
             Program.mkProgram
                ( fun _ -> init, Cmd.ofMsg Fetch)

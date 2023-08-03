@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
     <PropertyGroup>
-        <RootNamespace>AgentBolero.Client</RootNamespace>
+        <RootNamespace>Client</RootNamespace>
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
@@ -21,9 +21,9 @@
       <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
     </ItemGroup>
     <ItemGroup>
+        <Content Include="tailwind\watch.ps1" />
         <Content Include="tailwind\build.ps1" />
         <Content Include="tailwind\tailwind.config.js" />
         <Content Include="tailwind\tailwind.css" />
-        <Content Include="tailwind\watch.ps1" />
     </ItemGroup>
 </Project>
