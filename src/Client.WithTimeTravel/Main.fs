@@ -1,6 +1,6 @@
 namespace Client
 
-open System.Text.Json
+
 open System.Text.Json.Serialization
 open Bolero
 open Bolero.Remoting.Client
@@ -21,18 +21,19 @@ type Message =
     | Redirect of Page
     | Post
     | SetInput of string
-    | Fetch    
-    
-[<CLIMutable>]
-type Model = { page: Page; input: string}
+    | Fetch
 
+[<CLIMutable>]
+type Model = { page: Page; input: string }
 
 module Main =
     open Elmish
     let router = Router.infer Navigate (fun model -> model.page)
-    let init = { page = Home; input = ""}
+    let init = { page = Home; input = "" }
+
     let update debounce js message model =
-        Console.WriteLine $"{JsonSerializer.Serialize(message)}"
+        Console.WriteLine $"{message}"
+
         let log (newModel, cmd) =
             match model.page with
             | Session session ->
@@ -46,6 +47,7 @@ module Main =
                                 message = message |} |]
                           (fun _ -> Redirect Home) ]
             | _ -> newModel, cmd
+
         match message with
         | Navigate page -> { model with page = page }, Cmd.ofMsg Fetch
         | Redirect page -> { model with page = page }, Cmd.none
@@ -99,5 +101,5 @@ module Main =
                 loop None)
 
         override this.Program =
-            Program.mkProgram (fun _ -> init, Cmd.ofMsg Fetch) (update debounce this.JSRuntime) view
+            Program.mkProgram (fun _ -> init, Cmd.none) (update debounce this.JSRuntime) view
             |> Program.withRouter router

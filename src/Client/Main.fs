@@ -106,11 +106,8 @@ module Main =
     
     type MyApp() =
         inherit ProgramComponent<Model, Message>()
-        
-
-        
 
         override this.Program =
-            Program.mkProgram ( fun _ -> init, Cmd.ofMsg Fetch) (update this.JSRuntime) view
+            Program.mkProgram ( fun _ -> init, Cmd.none) (update this.JSRuntime) view
             |> Program.withRouter router
 

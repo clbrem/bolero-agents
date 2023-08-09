@@ -95,7 +95,7 @@ module Main =
         
         override this.Program =
             Program.mkProgram
-               ( fun _ -> init, Cmd.ofMsg Fetch)
+               ( fun _ -> init, Cmd.none)
                (update debounce this.JSRuntime) view
             |> Program.withRouter router
 
