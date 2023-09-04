@@ -1,4 +1,4 @@
-﻿const table = "Input"
+﻿ const table = "Input"
 const logs= "Logs"
 const session = "session"
 const version = 1

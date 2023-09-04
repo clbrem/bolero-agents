@@ -6,6 +6,7 @@ open Bolero
 open Bolero.Remoting.Client
 open Bolero.Templating.Client
 open System
+open Agents
 
 type Main = Template<"wwwroot/main.html">
 
@@ -29,10 +30,10 @@ type Model = { page: Page; input: string }
 module Main =
     open Elmish
     let router = Router.infer Navigate (fun model -> model.page)
-    let init = { page = Home; input = "" }
+    let debugRouter = Router.infer (Navigate >> Debugger.Message) (fun (model: Debugger.Model<Model>) -> model.model.page)
+    let init = { page = Home; input = "" }    
 
-    let update debounce js message model =
-        Console.WriteLine $"{message}"
+    let update debounce js message model =        
 
         let log (newModel, cmd) =
             match model.page with
@@ -85,7 +86,7 @@ module Main =
             .Elt()
 
     type MyApp() =
-        inherit ProgramComponent<Model, Message>()
+        inherit ProgramComponent<Debugger.Model<Model>, Debugger.Message<Message, Model>>()
         let TIMEOUT = TimeSpan.FromMilliseconds(500)
 
         let debounce =
@@ -99,7 +100,19 @@ module Main =
                     }
 
                 loop None)
+        let readMessages js (model: Model) msg =
+            match model.page with
+            | Session session-> 
+              Cmd.OfJS.perform js "Database.readLog" [|session|] msg
+            | _ -> Cmd.none
+        
 
         override this.Program =
-            Program.mkProgram (fun _ -> init, Cmd.none) (update debounce this.JSRuntime) view
-            |> Program.withRouter router
+            
+            let innerUpdate = update debounce this.JSRuntime
+            let update = Debugger.update init (readMessages this.JSRuntime) innerUpdate   
+            Program.mkProgram
+              (fun _ -> Debugger.model init, Cmd.none)
+              update 
+              (Debugger.view view)
+            |> Program.withRouter debugRouter

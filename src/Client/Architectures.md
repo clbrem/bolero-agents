@@ -20,9 +20,14 @@ flowchart TD
 ```
 ## M-V-C (Not Immutable!)
 ```mermaid
-flowchart TD
-    View(View) -->|User Interaction| Controller(Controller)
-    Controller -->|Manipulates| Model(Model)
-    Model --> |Update|View
+flowchart TB    
+    View(View) -->|User Sees| User
+    Model(Model) -->|Update| View
+    ControllerA -->|Manipulates| Model(Model)
+    ControllerB -->|Manipulates| Model(Model)    
+    User -->|User Interaction| ControllerB(Controller)
+    User(User) -->|User Interaction| ControllerA(Controller)
+    
+    
 ```
 

@@ -2,11 +2,12 @@
 open Elmish
 
 module Debugger =
-    type Message<'Msg> =
+    type Message<'Msg, 'Model> =
         | Message of 'Msg 
         | StepForward
         | StepBack
         | Load
+        | Populate of 'Msg list
 
     type Model<'T> =
         { model: 'T
@@ -16,30 +17,35 @@ module Debugger =
     let model inner =
         { model = inner
           advance = None
-          back = [] }        
-
-    // tests if isDebugging
-    let isDebugging =
-        function
-        | { advance = Some _ } -> true
-        | _ -> false
+          back = [] }            
 
     // View Transformer
     let view (innerView: 'T -> ('M -> unit) -> 'N) =
         fun model dispatch ->
             innerView
                 model.model
-                (
-                // ignore if is debugging
-                if isDebugging model then
-                    fun _ -> ()
-                else
-                    Message >> dispatch
-                )
+                ( Message >> dispatch )
     
-    let update readAsync (innerUpdate : 'M -> 'T -> 'T*Cmd<'M>) (message: Message<'M>) (model: Model<'T>) =
-        
+    let update (init: 'T) readAsync (innerUpdate : 'M -> 'T -> 'T*Cmd<'M>) (message: Message<'M, 'T>) (model: Model<'T>) =
+        System.Console.WriteLine(message)
+        let fold (messages: 'M list) : 'T list=
+            let justUpdateModel msg = innerUpdate msg >> fst
+            let folder =
+                function
+                | a :: rest ->
+                    fun m -> justUpdateModel m a :: a :: rest
+                | _ ->
+                    fun m -> justUpdateModel m init :: init :: []
+            List.fold folder [] messages
+            
+            
         match message, model  with
+            |Populate messages, _ ->
+                {
+                 model with
+                   advance = Some []
+                   back = fold messages 
+                 }, Cmd.ofMsg StepBack
             | StepForward, {advance = Some (a :: rest)}->
                 { model with
                     advance = Some rest
@@ -50,8 +56,7 @@ module Debugger =
             | StepForward, { advance = Some []} ->
                 {
                     model with
-                        advance = None
-                        model = a
+                        advance = None                        
                 }, Cmd.none
             | StepBack, { advance = Some items; back = a :: rest } ->
                 {
@@ -60,20 +65,19 @@ module Debugger =
                       model = a
                       back = rest
                 }, Cmd.none
-            | StepBack, { advance = Some items; back = [] }
-               {
-                   
-               }
-            | _ -> model, Cmd.none
-
-            match message with
-            | Message msg ->
+            | StepBack, { advance = Some _ ; back = [] } ->
+               model, Cmd.none
+            | StepBack, {advance = None} ->
+                model, readAsync model.model Populate
+            | Message msg, {advance = None} ->
                 let updated, cmd = innerUpdate msg model.model
                 { model with
                     model = updated
-                }, Cmd.map Message cmd
-            | _ -> model, Cmd.none 
-            
+                }, Cmd.map Message cmd            
+            | _ -> model, Cmd.none
+    
+    
+    
  
 
  
