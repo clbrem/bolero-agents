@@ -1,6 +1,6 @@
 ﻿ const table = "Input"
 const logs= "Logs"
-const session = "session"
+const sessionIndex = "session"
 const version = 1
 Database = {
     write: writeData,
@@ -23,7 +23,7 @@ function writeData(data) {
         req.onerror = reject
         req.onupgradeneeded = e => {
             const db = e.target.result
-            db.createObjectStore(table, {keyPath: session})
+            db.createObjectStore(table, {keyPath: sessionIndex})
         }
         req.onsuccess = e => write(e.target.result)
     })
@@ -64,7 +64,7 @@ function log(data) {
             const db = e.target.result
             const objectStore = 
                 db.createObjectStore(logs, {autoIncrement: true});
-            objectStore.createIndex(session, session, {unique: false});
+            objectStore.createIndex(sessionIndex, sessionIndex, {unique: false});
         }
         req.onsuccess = e => write(e.target.result) 
     })
@@ -74,16 +74,20 @@ function readLog(session) {
         const read = (db) => {
             let response = []
             const index = 
-                db.transaction(logs).objectStore(logs).index(session)
-            const cursor = index.openCursor()
+                db.transaction(logs).objectStore(logs).index(sessionIndex)
+            const cursor = index.openCursor(IDBKeyRange.only(session))
             cursor.onerror = reject
             cursor.onsuccess = event => {
                 const curs= event.target.result
                 if (curs) {
-                    curs.push(curs.value.message)
-                } 
+                    response.push(curs.value.message)
+                    curs.continue()
+                } else {
+                    return resolve(response)                    
+                }
+                
             }
-            return resolve(response)
+
         }
         const req = indexedDB.open(logs, version)
         req.onerror = reject

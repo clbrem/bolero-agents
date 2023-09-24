@@ -9,6 +9,7 @@ open System
 open Agents
 
 type Main = Template<"wwwroot/main.html">
+type Wrapper = Template<"wwwroot/wrapper.html">
 
 [<JsonFSharpConverter>]
 type Page =
@@ -106,6 +107,13 @@ module Main =
               Cmd.OfJS.perform js "Database.readLog" [|session|] msg
             | _ -> Cmd.none
         
+        let wrappedView (model: Debugger.Model<Model>) dispatch =
+            Wrapper()
+                .Content( view model.model (Debugger.dispatch model dispatch ))
+                .Back(fun _ -> dispatch Debugger.StepBack)
+                .Forward(fun _ -> dispatch Debugger.StepForward)
+                .Elt()
+            
 
         override this.Program =
             
@@ -114,5 +122,5 @@ module Main =
             Program.mkProgram
               (fun _ -> Debugger.model init, Cmd.none)
               update 
-              (Debugger.view view)
+              wrappedView
             |> Program.withRouter debugRouter

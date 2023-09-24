@@ -25,7 +25,10 @@ module Debugger =
             innerView
                 model.model
                 ( Message >> dispatch )
-    
+    let dispatch model update =
+        match model.advance  with
+        | None -> Message >> update
+        | _ -> fun _ -> ()
     let update (init: 'T) readAsync (innerUpdate : 'M -> 'T -> 'T*Cmd<'M>) (message: Message<'M, 'T>) (model: Model<'T>) =
         System.Console.WriteLine(message)
         let fold (messages: 'M list) : 'T list=
