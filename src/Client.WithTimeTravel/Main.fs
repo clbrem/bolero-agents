@@ -112,6 +112,9 @@ module Main =
                 .Content( view model.model (Debugger.dispatch model dispatch ))
                 .Back(fun _ -> dispatch Debugger.StepBack)
                 .Forward(fun _ -> dispatch Debugger.StepForward)
+                .ForwardButton(match model.advance with | None -> "opacity-50 cursor-not-allowed" |_-> "")
+                .BackButton(match model.advance, model.back with |Some _, [] -> "opacity-50 cursor-not-allowed" |_-> "")
+                .Debugging(match model.advance with | None -> "" | _ -> "debugging")
                 .Elt()
             
 

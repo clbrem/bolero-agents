@@ -1,9 +1,19 @@
-﻿${Content}
-<nav class="container">
-    <button onclick="${Back}">
-        Back
-    </button>
-    <button onclick="${Forward}">
-        Forward
-    </button>
+﻿<div class="${Debugging}">
+${Content}
+</div>
+<nav class="container flex justify-between px-4 py-8 mx-auto bg-white">
+    <div>
+        <button onclick="${Back}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded ${BackButton}">
+            Back
+        </button>
+        <button onclick="${Forward}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded ${ForwardButton}">
+            Forward
+        </button>        
+    </div>
+    
+    <template id="not-used">
+        <button onclick="${Forward}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+            Forward
+        </button>
+    </template>
 </nav>

@@ -38,3 +38,8 @@ body {
   margin-right: auto;
   margin-bottom: 5px;
 }
+
+.debugging input {
+  pointer-events: none;
+  opacity: 0.5;
+}
