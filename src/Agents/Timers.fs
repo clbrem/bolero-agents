@@ -20,13 +20,22 @@ module Timers =
         timer.Start()
         timer
     
+    /////////////////////////////////////
+    ///
+    /// DEBOUNCE AGENT
+    ///
+    /////////////////////////////////////
+    
     let delay(timeout: System.TimeSpan) =
         MailboxProcessor.Start(
             fun inbox ->
                 let rec loop timer =
                     async {
-                       let! dispatch, msg  = inbox.Receive()                         
-                       tryDispose timer                       
+                       // Block the thread until a new message comes in
+                       let! dispatch, msg  = inbox.Receive()
+                       // If timer hasn't fired, dispose it!
+                       tryDispose timer
+                       // Create a new timer that fires with msg after a while.
                        use timer = wait timeout dispatch msg 
                        return! Some timer |> loop                        
                     }

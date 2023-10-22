@@ -16,20 +16,23 @@ type Page =
 
 ////////////////////////
 ///
-///  MESSAGE
+///  MESSAGE (These are our "VERBS")
+/// 
+///  NOTE: DISCRIMINATED UNION ("OR" type)
 ///
 //////////////////////
 
+
 type Message =
-    | Navigate of Page      // Navigate to a Page
-    | Redirect of Page      // Same as Navigate     
+    | Navigate of Page      // Navigate to a Page (Reserved for "Router")
+    | Redirect of Page      // Same as Navigate      
     | Post                  // POST form
     | SetInput of string    // Set form input
     | Fetch                 // FETCH input history 
 
 ////////////////////////////////////
 ///
-///    MODEL
+///    MODEL (These are our "NOUNS")
 ///
 /////////////////////////////////// 
 
@@ -44,7 +47,7 @@ module Main =
     
     ///////////////////////////////////
     ///
-    ///   ROUTER
+    ///   ROUTER (Map URL to NOUN)
     ///
     ///////////////////////////////////
 
@@ -62,7 +65,7 @@ module Main =
     
     //////////////////////////////////
     ///    
-    ///   UPDATE
+    ///   UPDATE (VERB & NOUN INTERACTION)
     ///
     ///////////////////////////////////
 

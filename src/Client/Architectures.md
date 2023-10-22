@@ -2,9 +2,9 @@
 
 ## M-V-U 
 ```mermaid
-flowchart TD
+flowchart LR
+    Model(Model) -->|View Engine| View
     View(View) -->|Dispatch| Update
-    Model(Model) -->|View Engine| View 
     Update(Update) -->|Update Function| Model    
 ```
 * All updates to model are dispatched through a single message queue
@@ -13,21 +13,21 @@ flowchart TD
 
 ## M-V-VM (Not Unidirectional!)
 ```mermaid
-flowchart TD
-    View(View) <-->|Data Binding| ViewModel
-    ViewModel(ViewModel) --> |Dispatch| Model
+flowchart LR
     Model(Model) --> |Update| ViewModel
+    View(View) <-->|Data Binding| ViewModel    
+    ViewModel(ViewModel) --> |Dispatch| Model
+    
+    
 ```
-## M-V-C (Not Immutable!)
+## M-V-C (Multiple channels!)
 ```mermaid
-flowchart TB    
-    View(View) -->|User Sees| User
+flowchart LR
     Model(Model) -->|Update| View
+    View(View) -->|User Interaction| ControllerB(Controller)
+    View -->|User Interaction| ControllerA(Controller)
     ControllerA -->|Manipulates| Model(Model)
     ControllerB -->|Manipulates| Model(Model)    
-    User -->|User Interaction| ControllerB(Controller)
-    User(User) -->|User Interaction| ControllerA(Controller)
-    
-    
+     
 ```
 

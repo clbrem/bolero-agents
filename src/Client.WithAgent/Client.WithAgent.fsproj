@@ -21,6 +21,7 @@
       <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
     </ItemGroup>
     <ItemGroup>
+        <Content Include="Agents.md" />
         <Content Include="tailwind\watch.ps1" />
         <Content Include="tailwind\build.ps1" />
         <Content Include="tailwind\tailwind.config.js" />

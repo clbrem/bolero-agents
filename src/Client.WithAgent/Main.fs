@@ -80,18 +80,13 @@ module Main =
         
         
         let TIMEOUT = TimeSpan.FromMilliseconds(500)
-        let debounce = MailboxProcessor.Start(
-            fun inbox ->
-                let rec loop timer =
-                    async {
-                        let! dispatch, msg = inbox.Receive()
-                        Agents.Timers.tryDispose timer
-                        use timer = Agents.Timers.wait TIMEOUT dispatch msg
-                        return! loop (Some timer)
-                    }
-                loop None
-            )
         
+        //////////////////////////////////////////
+        ///
+        /// INITIALIZE DEBOUNCE 
+        ///
+        /////////////////////////////////////////
+        let debounce = Agents.Timers.delay(TIMEOUT)        
         
         override this.Program =
             Program.mkProgram

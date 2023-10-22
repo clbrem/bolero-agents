@@ -31,13 +31,21 @@ type Model = { page: Page; input: string }
 module Main =
     open Elmish
     let router = Router.infer Navigate (fun model -> model.page)
+        
     let debugRouter = Router.infer (Navigate >> Debugger.Message) (fun (model: Debugger.Model<Model>) -> model.model.page)
     let init = { page = Home; input = "" }    
 
-    let update debounce js message model =        
+    let update debounce js message model =
+        
+        ////////////////////////////////////////////
+        ///
+        /// ATTACH A "LOGGER"  
+        ///
+        ///////////////////////////////////////////
 
         let log (newModel, cmd) =
             match model.page with
+            // Only log if in an active session
             | Session session ->
                 newModel,
                 Cmd.batch
@@ -66,7 +74,6 @@ module Main =
                     (fun _ -> Redirect Home)
             | Home ->
                 let guid = Guid.NewGuid() |> string
-
                 Cmd.OfJS.perform
                     js
                     "Database.write"
@@ -99,8 +106,12 @@ module Main =
                         use timer = Agents.Timers.wait TIMEOUT dispatch msg
                         return! loop (Some timer)
                     }
-
                 loop None)
+        //////////////////////////////
+        ///
+        /// RETRIEVE LOG
+        ///
+        /////////////////////////////
         let readMessages js (model: Model) msg =
             match model.page with
             | Session session-> 
