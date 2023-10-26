@@ -22,7 +22,6 @@ type Page =
 ///
 //////////////////////
 
-
 type Message =
     | Navigate of Page      // Navigate to a Page (Reserved for "Router")
     | Redirect of Page      // Same as Navigate      
@@ -73,7 +72,7 @@ module Main =
         Console.WriteLine ($"{message}")
         match message with
         | Navigate page ->
-            {model with page = page}, Cmd.ofMsg Fetch        
+            {model with page = page}, Cmd.ofMsg Fetch // "Side Effect"
         | SetInput input ->
             {model with input = input}, Cmd.none
         | Redirect page ->
